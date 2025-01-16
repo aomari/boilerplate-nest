@@ -1,42 +1,54 @@
-name: CI Pipeline
+name: CI Pipeline # Name of the workflow; appears in the GitHub Actions UI.
 
-on:
-  pull_request:
+on: # Defines the events that trigger this workflow.
+  pull_request: # Trigger the workflow when a pull request targets the main branch.
     branches:
       - main
-  push:
+  push: # Trigger the workflow when code is pushed to the main branch.
     branches:
       - main
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v2
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
+
+jobs: # Defines a set of tasks (jobs) to be executed.
+  build: # Name of the job.
+    runs-on: ubuntu-latest # Specify the virtual machine to run the job.
+
+    steps: # Sequence of tasks within the build job.
+      - name: Check out the repository # Step to clone the repository code into the runner.
+        uses: actions/checkout@v2 # GitHub-provided action to fetch code.
+
+      - name: Cache Node.js modules # Use a cache to save and restore dependencies.
+        uses: actions/cache@v3 # GitHub action for caching.
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock') }}
+          path: node_modules # Cache the node_modules folder.
+          key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock') }} # Cache key based on OS and yarn.lock hash.
           restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Set up Node.js
+            ${{ runner.os }}-node- # Fallback keys if an exact match isn't found.
+
+      - name: Set up Node.js # Install Node.js in the runner.
         uses: actions/setup-node@v3
         with:
-          node-version: 'lts/*'
-      - name: Verify Node.js version
+          node-version: 'lts/*' # Install the latest LTS (Long-Term Support) version of Node.js.
+
+      - name: Verify Node.js version # Confirm the installed Node.js version.
         run: node -v
-      - name: Install dependencies
+
+      - name: Install dependencies # Install project dependencies using Yarn.
         run: yarn install
-      - name: Compile TypeScript
+
+      - name: Compile TypeScript # Compile the TypeScript files to JavaScript.
         run: yarn compile
-      - name: Run Lint
+
+      - name: Run Lint # Analyze code for potential issues and enforce code style.
         run: yarn lint
-      - name: Run Security Audit
+
+      - name: Run Security Audit # Check for security vulnerabilities in dependencies.
         run: yarn audit
-      # - name: Run Tests
+
+      # - name: Run Tests # Run the project test suite. (Currently commented out)
       #   run: yarn test
-      # - name: Generate Coverage Report
+
+      # - name: Generate Coverage Report # Generate test coverage report. (Currently commented out)
       #   run: yarn test --coverage
-      - name: Build Project
+
+      - name: Build Project # Build the final application or project.
         run: yarn build

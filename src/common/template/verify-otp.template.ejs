@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Verification - Asal Template</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #e0e0e0;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        background-color: #777777;
+        color: white;
+        border-radius: 8px;
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        text-align: center;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .message {
+        font-size: 16px;
+        color: white;
+        line-height: 1.5;
+      }
+      .otp {
+        text-align: center;
+        font-size: 36px;
+        color: #efaa00;
+        letter-spacing: 5px;
+        font-weight: bold;
+        margin: 20px 0;
+      }
+      .time {
+        font-weight: bold;
+        color: #c70000;
+      }
+      .footer {
+        font-size: 12px;
+        color: #999;
+        text-align: center;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">Verify Your Email Address</div>
+      <div class="message">
+        Hello <%= recipientName %>, <br /><br />
+        Thank you for signing up with Asal Template. To complete your
+        registration, please use the following OTP to verify your email address.
+        The OTP will expire in <span class="time">30</span> minutes.
+      </div>
+      <div class="otp"><%= otp %></div>
+      <div class="message">
+        If you didn't request this email, please ignore it.
+      </div>
+      <div class="footer">© 2024 Asal Template</div>
+    </div>
+  </body>
+</html>
