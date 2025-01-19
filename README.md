@@ -84,6 +84,36 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
+## Throttling Configuration
+
+The project uses the `@nestjs/throttler` package to implement rate limiting. This helps to control the number of requests a client can make to the server within a specified time period, preventing abuse and ensuring fair usage of the API.
+
+### Throttling Strategies
+
+The following throttling strategies are configured in the project:
+
+1. **Short Term**:
+   - **TTL**: 1 second
+   - **Limit**: 3 requests
+
+2. **Medium Term**:
+   - **TTL**: 10 seconds
+   - **Limit**: 20 requests
+
+3. **Long Term**:
+   - **TTL**: 60 seconds
+   - **Limit**: 100 requests
+
+### Global Throttling Guard
+
+The `ThrottlerGuard` is applied globally to all routes and controllers in the application. This ensures that rate limiting is enforced across the entire application.
+
+### Benefits of Throttling
+
+- **Prevent Abuse**: Protects the application from potential denial-of-service (DoS) attacks by limiting the number of requests a client can make.
+- **Fair Usage**: Ensures that all clients have fair access to the API by preventing any single client from monopolizing server resources.
+- **Easy Configuration**: Centralized configuration makes it easy to manage and adjust rate limiting settings as needed.
+
 
 ## GitHub Actions
 

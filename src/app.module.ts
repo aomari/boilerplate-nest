@@ -9,6 +9,8 @@ import { LoggerModule } from './logger';
 import { CleanupModule } from './cleanup';
 import { MailModule } from './mail/mail.module';
 import { OtpModule } from './otp/otp.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -30,6 +32,23 @@ import { OtpModule } from './otp/otp.module';
       }),
       inject: [ConfigService],
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 3,
+      },
+      {
+        name: 'medium',
+        ttl: 10000,
+        limit: 20
+      },
+      {
+        name: 'long',
+        ttl: 60000,
+        limit: 100
+      }
+    ]),
     LoggerModule,
     CleanupModule,
     UserModule,
@@ -38,6 +57,12 @@ import { OtpModule } from './otp/otp.module';
     OtpModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule { }
