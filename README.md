@@ -182,7 +182,7 @@ To run the project, follow these steps:
      ```
 
 5. **Access Swagger Documentation**:
-   - Open your browser and navigate to [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to access the Swagger documentation.
+   - Open your browser and navigate to [http://localhost:3000/api](http://localhost:3000/api) to access the Swagger documentation.
 
 
 ## How to Generate Technical Documentation

@@ -124,7 +124,7 @@ If everything is set up correctly, you should receive a response from the NestJS
 
 The NestJS backend service includes Swagger documentation for the API. You can access it at:
 
-[http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+[http://localhost:3000/api](http://localhost:3000/api)
 
 This link will show you the interactive API documentation where you can explore and test the available API endpoints.
 

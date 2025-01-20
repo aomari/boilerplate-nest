@@ -41,13 +41,13 @@ import { APP_GUARD } from '@nestjs/core';
       {
         name: 'medium',
         ttl: 10000,
-        limit: 20
+        limit: 20,
       },
       {
         name: 'long',
         ttl: 60000,
-        limit: 100
-      }
+        limit: 100,
+      },
     ]),
     LoggerModule,
     CleanupModule,
@@ -65,4 +65,4 @@ import { APP_GUARD } from '@nestjs/core';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}
