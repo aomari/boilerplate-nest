@@ -19,4 +19,16 @@ export class User {
 
   @OneToMany(() => Otp, (otp) => otp.user)
   otps?: Otp[];
+
+  @Column({ nullable: true })
+  firstName?: string;
+
+  @Column({ nullable: true })
+  lastName?: string;
+
+  @Column({ type: 'date', nullable: true })
+  dateOfBirth?: Date;
+
+  @Column({ nullable: true })
+  profilePicture?: string;
 }

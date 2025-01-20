@@ -192,7 +192,9 @@ export class AuthService {
 
     if (user.status === UserStatus.ACTIVE) {
       const payload: TokenPayload = { email, id: user.id };
-      const access_token = this.jwtService.sign(payload);
+      const access_token = this.jwtService.sign(payload, {
+        expiresIn: this.configService.get<string>('JWT_EXPIRATION'),
+      });
       const refreshToken = this.jwtService.sign(payload, {
         expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
       });
@@ -223,10 +225,16 @@ export class AuthService {
   async refreshToken(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken);
-      const newAccessToken = this.jwtService.sign({
-        username: payload.username,
-        id: payload.id,
-      });
+      const newAccessToken = this.jwtService.sign(
+        {
+          username: payload.username,
+          id: payload.id,
+        },
+        {
+          expiresIn: this.configService.get<string>('JWT_EXPIRATION'),
+        },
+      );
+
       const newRefreshToken = this.jwtService.sign(payload, {
         expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
       });

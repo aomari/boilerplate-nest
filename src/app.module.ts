@@ -11,6 +11,7 @@ import { MailModule } from './mail/mail.module';
 import { OtpModule } from './otp/otp.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ProfileModule } from './profile/profile.module';
 import databaseConfig from './config/database.config';
 import appConfig from './config/app.config';
 
@@ -58,6 +59,7 @@ import appConfig from './config/app.config';
     AuthModule,
     MailModule,
     OtpModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [
