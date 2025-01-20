@@ -60,7 +60,7 @@ export class AuthController {
   @Post('verify-signup-otp')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'verify the otp for new user account',
+    summary: 'verify the otp for new user account (12345 for testing)',
   })
   @ApiResponse({
     status: HttpStatus.OK,

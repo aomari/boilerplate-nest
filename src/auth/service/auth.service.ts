@@ -136,6 +136,14 @@ export class AuthService {
       otp,
     );
     if (isValidOTP) {
+      const updatedUser = await this.userService.updateUser(user.id, {
+        status: UserStatus.ACTIVE,
+      });
+
+      // Validate the return value
+      if (updatedUser.status !== UserStatus.ACTIVE) {
+        throw new Error('Failed to update user status to ACTIVE');
+      }
       return {
         message: 'OTP verified successfully.',
       };
@@ -182,8 +190,11 @@ export class AuthService {
         expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
       });
 
+      // Exclude the password field from the returned user object
+      const { id, username, status } = user;
+
       return {
-        user,
+        user: { id, username, email, status },
         access_token,
         refreshToken,
       };
