@@ -1,12 +1,31 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthService } from './service';
 import { LoginDto, RefreshTokenDto, SignupDto } from './dto';
 import { ResendSignupDto } from './dto/resendSignup.dto';
 import { ResendSignupResponseDTO } from './dto/resendSignupResponse.dto';
 import { VerifySignupOtpDto } from './dto/verifySignupOtp.dto';
 import { VerifySignupOtpResponseDto } from './dto/verifySignupOtpResponse.dto';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { User } from 'src/user';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -94,5 +113,30 @@ export class AuthController {
   @ApiBody({ type: RefreshTokenDto })
   async refreshToken(@Body() body: RefreshTokenDto) {
     return await this.authService.refreshToken(body.refreshToken);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Patch('change-password')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Password changed successfully.',
+    type: User,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Old password is incorrect.',
+  })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error.',
+  })
+  async changePassword(
+    @Req() req,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    const userId = req.user.id; // Extracted from JWT payload
+    return this.authService.changePassword(userId, changePasswordDto);
   }
 }

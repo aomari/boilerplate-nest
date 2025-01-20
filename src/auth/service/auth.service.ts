@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserService, UserStatus } from 'src/user';
 import { ConfigService } from '@nestjs/config';
@@ -12,8 +18,9 @@ import {
   VerifySignupOtpResponseDto,
   VerifySignupOtpDto,
   ResendSignupResponseDTO,
-} from '../dto';
+} from '../../auth/dto';
 import { OtpService, OtpType } from 'src/otp';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 
 /**
  * Service for managing user authentication processes, including sign-up, login, OTP verification, and token management.
@@ -191,10 +198,10 @@ export class AuthService {
       });
 
       // Exclude the password field from the returned user object
-      const { id, username, status } = user;
+      delete user.password;
 
       return {
-        user: { id, username, email, status },
+        user,
         access_token,
         refreshToken,
       };
@@ -228,5 +235,55 @@ export class AuthService {
     } catch {
       throw new HttpException('Invalid refresh token', HttpStatus.UNAUTHORIZED);
     }
+  }
+
+  /**
+   * Changes the password for a user.
+   *
+   * @async
+   * @param {string} userId - The ID of the user.
+   * @param {ChangePasswordDto} changePasswordDTO - Data transfer object containing old and new passwords.
+   * @returns {Promise<User>} The updated user entity without the password field.
+   * @throws {NotFoundException} If the user is not found.
+   * @throws {BadRequestException} If the old password is incorrect.
+   */
+  async changePassword(
+    userId: string,
+    changePasswordDTO: ChangePasswordDto,
+  ): Promise<User> {
+    const { oldPassword, newPassword } = changePasswordDTO;
+
+    // Fetch the user from the DB
+    const user = await this.userService.getUser({ id: userId });
+
+    // Check if the user exists
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if the encrypted old password matches the stored password
+    const isCorrectOldPassword = await this.passwordService.comparePassword(
+      oldPassword,
+      user.password,
+    );
+
+    if (!isCorrectOldPassword) {
+      throw new BadRequestException('Old password is incorrect');
+    }
+
+    // Encrypt the new password
+    const newEncryptedPassword: string =
+      await this.passwordService.encryptPassword(newPassword);
+
+    // Update the user's password in the database
+    const updatedUser: User = await this.userService.updateUser(user.id, {
+      password: newEncryptedPassword,
+    });
+
+    // Delete the password field from the response object
+    delete updatedUser.password;
+
+    // Return the updated user object without the password
+    return updatedUser;
   }
 }

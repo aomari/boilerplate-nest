@@ -32,12 +32,16 @@ export class SignupDto {
   email: string;
 
   @ApiProperty({
-    example: '123456',
+    example: 'Test@123',
     required: true,
     description: 'Password must be at least 6 characters long.',
   })
-  @MinLength(6, { message: 'Password must be at least 6 characters long.' })
   @IsString()
+  @MinLength(6, { message: 'New password must be at least 6 characters long' })
+  @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).*$/, {
+    message:
+      'New password must contain at least one uppercase letter, one lowercase letter, and one number',
+  })
   @IsNotEmpty()
   password: string;
 }
