@@ -6,18 +6,18 @@ services:
     container_name: nestjs-backend-container
     restart: always
     ports:
-      - "3000:3000" # Expose backend port
+      - '3000:3000' # Expose backend port
     environment:
-      DB_HOST: mysql           # MySQL service name
-      DB_PORT: 3306            # MySQL internal port
+      DB_HOST: mysql # MySQL service name
+      DB_PORT: 3306 # MySQL internal port
       DB_USERNAME: nestjs_user
       DB_PASSWORD: nestjs_password
       DB_NAME: nestjs_db
     depends_on:
-      - mysql                  # Wait for MySQL to be ready
+      - mysql # Wait for MySQL to be ready
     networks:
       - nestjs-network
 
 networks:
   nestjs-network:
-    external: true  # Use the existing external network
+    external: true # Use the existing external network

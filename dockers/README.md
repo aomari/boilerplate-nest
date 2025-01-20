@@ -1,4 +1,3 @@
-
 # Setup and Run MySQL and NestJS Backend with Docker Compose
 
 This guide provides step-by-step instructions on how to run MySQL and NestJS backend services using Docker Compose on your local machine or server.
@@ -24,6 +23,7 @@ Ensure that the folder structure on your local machine is similar to the one sho
 ```
 
 ### Files:
+
 - `nestjs-backend.Dockerfile`: Contains the Dockerfile for building the NestJS backend image.
 - `nestjs-docker-compose.yml`: The Docker Compose configuration for the NestJS backend service.
 - `mysql-docker-compose.yml`: The Docker Compose configuration for the MySQL service.
@@ -163,6 +163,7 @@ docker compose -f mysql-docker-compose.yml down --volumes --remove-orphans
 ```
 
 This command will:
+
 - Stop the MySQL container
 - Remove the associated volume (`mysql-data`)
 - Remove any orphaned containers
@@ -174,6 +175,7 @@ docker compose -f nestjs-docker-compose.yml down --volumes --remove-orphans
 ```
 
 This command will:
+
 - Stop the NestJS backend container
 - Remove the associated volumes
 - Remove any orphaned containers
@@ -183,7 +185,6 @@ This command will:
 If you encounter any issues, here are some common solutions:
 
 - **MySQL container not starting**: Ensure there are no port conflicts with other services using port `3307`. You can change the exposed port in the `mysql-docker-compose.yml` file.
-  
 - **NestJS container not connecting to MySQL**: Ensure that the `DB_HOST` environment variable in the `nestjs-docker-compose.yml` is set to `mysql` (the name of the MySQL service in the `mysql-docker-compose.yml` file).
 
 - **Ports already in use**: If the ports `3307` or `3000` are already being used, you can modify the `docker compose` files to use different ports.
