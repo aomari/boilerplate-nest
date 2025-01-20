@@ -128,7 +128,7 @@ export class OtpService {
           templateType = TemplateType.VerifyEmail;
           subject = 'Verify Your Email Address';
           break;
-        case OtpType.FORGET_PASSWORD:
+        case OtpType.RESET_PASSWORD:
           templateType = TemplateType.ForgetPassword;
           subject = 'Reset Your Password';
           break;

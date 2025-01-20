@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   HttpCode,
+  HttpException,
   HttpStatus,
   Patch,
   Post,
@@ -24,6 +25,8 @@ import { VerifySignupOtpResponseDto } from './dto/verifySignupOtpResponse.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { User } from 'src/user';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ForgetPasswordDto } from './dto/forget-password.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -138,5 +141,45 @@ export class AuthController {
   ) {
     const userId = req.user.id; // Extracted from JWT payload
     return this.authService.changePassword(userId, changePasswordDto);
+  }
+
+  @Post('forget-password')
+  @ApiResponse({ status: HttpStatus.OK, description: 'OTP sent to email.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error.',
+  })
+  async forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {
+    const { email } = forgetPasswordDto;
+    const user = await this.authService.getUserByEmail(email);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    await this.authService.generateAndSendOtp(email);
+    return { message: 'OTP sent to email.' };
+  }
+
+  @Post('reset-password')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Password reset successfully.',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid OTP or email.',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error.',
+  })
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    const { email, otp, newPassword } = resetPasswordDto;
+    const isValidOtp = await this.authService.validateOtp(email, otp);
+    if (!isValidOtp) {
+      throw new HttpException('Invalid OTP or email', HttpStatus.BAD_REQUEST);
+    }
+    await this.authService.resetPassword(email, newPassword);
+    return { message: 'Password reset successfully.' };
   }
 }

@@ -286,4 +286,73 @@ export class AuthService {
     // Return the updated user object without the password
     return updatedUser;
   }
+
+  /**
+   * Retrieves a user by their email address.
+   *
+   * @async
+   * @param {string} email - The email address of the user.
+   * @returns {Promise<User>} The user entity.
+   * @throws {HttpException} If the user is not found.
+   */
+  async getUserByEmail(email: string): Promise<User> {
+    return this.userService.getUser({ email });
+  }
+
+  /**
+   * Generates and sends an OTP to the user's email address.
+   *
+   * @async
+   * @param {string} email - The email address of the user.
+   * @returns {Promise<void>}
+   * @throws {HttpException} If the user is not found.
+   */
+  async generateAndSendOtp(email: string): Promise<void> {
+    const user = await this.userService.getUser({ email });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    await this.otpService.generateAndSendOtp({
+      otpType: OtpType.RESET_PASSWORD,
+      recipientName: user.username,
+      targetEmail: email,
+      userId: user.id,
+    });
+  }
+
+  /**
+   * Validates the OTP for the given email address.
+   *
+   * @async
+   * @param {string} email - The email address of the user.
+   * @param {number} otp - The OTP to validate.
+   * @returns {Promise<boolean>} True if the OTP is valid, false otherwise.
+   * @throws {HttpException} If the user is not found.
+   */
+  async validateOtp(email: string, otp: number): Promise<boolean> {
+    const user = await this.userService.getUser({ email });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return this.otpService.isValidOtp(user.id, OtpType.RESET_PASSWORD, otp);
+  }
+
+  /**
+   * Resets the user's password.
+   *
+   * @async
+   * @param {string} email - The email address of the user.
+   * @param {string} newPassword - The new password to set.
+   * @returns {Promise<void>}
+   * @throws {HttpException} If the user is not found.
+   */
+  async resetPassword(email: string, newPassword: string): Promise<void> {
+    const user = await this.userService.getUser({ email });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    const encryptedPassword =
+      await this.passwordService.encryptPassword(newPassword);
+    await this.userService.updateUser(user.id, { password: encryptedPassword });
+  }
 }
