@@ -34,7 +34,7 @@ jobs: # Defines a set of tasks (jobs) to be executed.
 
       - name: Install dependencies # Install project dependencies using Yarn.
         run: yarn install
-      
+
       # Ensure @types/multer is installed
       - name: Verify @types/multer installation
         run: yarn list @types/multer
