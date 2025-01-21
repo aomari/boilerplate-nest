@@ -21,6 +21,7 @@ import {
 } from '../../auth/dto';
 import { OtpService, OtpType } from 'src/otp';
 import { ChangePasswordDto } from '../dto/change-password.dto';
+import { UserRole } from 'src/user/user-role.enum';
 
 /**
  * Service for managing user authentication processes, including sign-up, login, OTP verification, and token management.
@@ -57,7 +58,7 @@ export class AuthService {
    * @throws {HttpException} If the email or username already exists.
    */
   async signupService(signupDto: SignupDto): Promise<User> {
-    const { username, email, password } = signupDto;
+    const { username, email, password, role } = signupDto;
 
     let user = await this.userService.getUser({ email });
     if (user) {
@@ -76,6 +77,7 @@ export class AuthService {
       email,
       password: encryptedPassword,
       status: UserStatus.INACTIVE,
+      role: role || UserRole.USER, // Set default role to USER if not provided
     });
 
     this.otpService.generateAndSendOtp({
