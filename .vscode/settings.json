@@ -1,0 +1,7 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "eslint.validate": ["typescript"],
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}

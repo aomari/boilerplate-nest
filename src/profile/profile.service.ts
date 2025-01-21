@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
 import { User } from '../user/user.entity';
@@ -38,19 +34,13 @@ export class ProfileService {
    * @returns {Promise<User>} The updated user entity.
    * @throws {NotFoundException} If the user is not found.
    */
-  async updateProfile(
-    userId: string,
-    updateProfileDto: UpdateProfileDto,
-  ): Promise<User> {
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto): Promise<User> {
     const user = await this.userService.getUser({ id: userId });
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const updatedUser = await this.userService.updateUser(
-      userId,
-      updateProfileDto,
-    );
+    const updatedUser = await this.userService.updateUser(userId, updateProfileDto);
     delete updatedUser.password;
     return updatedUser;
   }
@@ -63,10 +53,7 @@ export class ProfileService {
    * @throws {NotFoundException} If the user is not found.
    * @throws {BadRequestException} If the file is invalid.
    */
-  async updateProfilePicture(
-    userId: string,
-    file: Express.Multer.File,
-  ): Promise<User> {
+  async updateProfilePicture(userId: string, file: Express.Multer.File): Promise<User> {
     const user = await this.userService.getUser({ id: userId });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -82,19 +69,11 @@ export class ProfileService {
     const validExtensions = ['png', 'jpeg', 'jpg'];
     const fileExtension = file.originalname.split('.').pop().toLowerCase();
     if (!validExtensions.includes(fileExtension)) {
-      throw new BadRequestException(
-        'Invalid file type. Only PNG, JPEG, and JPG are allowed',
-      );
+      throw new BadRequestException('Invalid file type. Only PNG, JPEG, and JPG are allowed');
     }
 
     // Ensure the storage directory exists
-    const storageDir = join(
-      __dirname,
-      '..',
-      '..',
-      'storage',
-      'profile-pictures',
-    );
+    const storageDir = join(__dirname, '..', '..', 'storage', 'profile-pictures');
     if (!existsSync(storageDir)) {
       mkdirSync(storageDir, { recursive: true });
     }

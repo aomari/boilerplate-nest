@@ -9,13 +9,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './service';
 import { LoginDto, RefreshTokenDto, SignupDto } from './dto';
 import { ResendSignupDto } from './dto/resendSignup.dto';
@@ -73,9 +67,7 @@ export class AuthController {
     description: 'Not found user',
   })
   @ApiBody({ type: ResendSignupDto })
-  resendSignupOtp(
-    @Body() resendSignupDto: ResendSignupDto,
-  ): Promise<ResendSignupResponseDTO> {
+  resendSignupOtp(@Body() resendSignupDto: ResendSignupDto): Promise<ResendSignupResponseDTO> {
     return this.authService.resendSignupService(resendSignupDto);
   }
 
@@ -135,10 +127,7 @@ export class AuthController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Internal server error.',
   })
-  async changePassword(
-    @Req() req,
-    @Body() changePasswordDto: ChangePasswordDto,
-  ) {
+  async changePassword(@Req() req, @Body() changePasswordDto: ChangePasswordDto) {
     const userId = req.user.id; // Extracted from JWT payload
     return this.authService.changePassword(userId, changePasswordDto);
   }

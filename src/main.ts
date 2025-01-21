@@ -23,4 +23,9 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port);
 }
-bootstrap();
+
+// Handle any errors that occur during the bootstrap process
+bootstrap().catch((err) => {
+  console.error('Error during bootstrap:', err);
+  process.exit(1);
+});

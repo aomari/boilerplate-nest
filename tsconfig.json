@@ -2,23 +2,25 @@
   "compilerOptions": {
     "types": ["jest", "Multer"],
     "typeRoots": ["node_modules/@types"],
-    "module": "commonjs",
+    "module": "CommonJS",  // Ensure CommonJS module system is used
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
     "sourceMap": true,
-    "outDir": "./dist",
+    "target": "ES6",
+    "outDir": "dist",
     "baseUrl": "./",
-    "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "strict": true
   },
   "include": ["src/**/*.ts", "test/**/*.ts"],
   "exclude": ["node_modules", "dist"]

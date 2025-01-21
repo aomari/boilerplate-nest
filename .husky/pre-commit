@@ -7,6 +7,8 @@ npx lint-staged
 # Check TypeScript types
 npx tsc --noEmit
 
-npx eslint . --fix
+# Run tests
+npx jest --bail --findRelatedTests
+
 # Format staged files
 npx prettier --write .

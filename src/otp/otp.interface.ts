@@ -1,5 +1,5 @@
-import { TemplateType } from 'src/common';
-import { OtpType } from './otp.enum';
+import type { TemplateType } from 'src/common';
+import type { OtpType } from './otp.enum';
 
 /**
  * Parameters required to send an OTP email to a user.

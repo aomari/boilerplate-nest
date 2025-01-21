@@ -41,10 +41,7 @@ export class PasswordService {
    * @param {string} hashedPassword - The hashed password stored in the database.
    * @returns {Promise<boolean>} A promise that resolves to `true` if the passwords match, or `false` otherwise.
    */
-  async comparePassword(
-    password: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
+  async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
     return bcrypt.compare(password, hashedPassword);
   }
 }

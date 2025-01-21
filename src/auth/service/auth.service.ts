@@ -69,8 +69,7 @@ export class AuthService {
       throw new HttpException('username already exist', HttpStatus.CONFLICT);
     }
 
-    const encryptedPassword =
-      await this.passwordService.encryptPassword(password);
+    const encryptedPassword = await this.passwordService.encryptPassword(password);
 
     const createUser = await this.userService.createUser({
       username,
@@ -80,7 +79,7 @@ export class AuthService {
       role: role || UserRole.USER, // Set default role to USER if not provided
     });
 
-    this.otpService.generateAndSendOtp({
+    await this.otpService.generateAndSendOtp({
       otpType: OtpType.SIGNUP_USER,
       recipientName: username,
       targetEmail: email,
@@ -98,9 +97,7 @@ export class AuthService {
    * @returns {Promise<ResendSignupResponseDTO>} Response object indicating OTP resend status.
    * @throws {HttpException} If the user is not found.
    */
-  async resendSignupService(
-    resendSignupDto: ResendSignupDto,
-  ): Promise<ResendSignupResponseDTO> {
+  async resendSignupService(resendSignupDto: ResendSignupDto): Promise<ResendSignupResponseDTO> {
     const { email } = resendSignupDto;
 
     const user = await this.userService.getUser({ email });
@@ -139,11 +136,7 @@ export class AuthService {
     if (!user) {
       throw new HttpException('Not found user', HttpStatus.NOT_FOUND);
     }
-    const isValidOTP = await this.otpService.isValidOtp(
-      user.id,
-      OtpType.SIGNUP_USER,
-      otp,
-    );
+    const isValidOTP = await this.otpService.isValidOtp(user.id, OtpType.SIGNUP_USER, otp);
     if (isValidOTP) {
       const updatedUser = await this.userService.updateUser(user.id, {
         status: UserStatus.ACTIVE,
@@ -157,10 +150,7 @@ export class AuthService {
         message: 'OTP verified successfully.',
       };
     } else {
-      throw new HttpException(
-        'OTP verification failed.',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('OTP verification failed.', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -176,20 +166,11 @@ export class AuthService {
     const { email, password } = loginDto;
     const user = await this.userService.getUser({ email });
     if (!user) {
-      throw new HttpException(
-        'invalid email or password',
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new HttpException('invalid email or password', HttpStatus.UNAUTHORIZED);
     }
-    const isCorrectPassword = await this.passwordService.comparePassword(
-      password,
-      user.password,
-    );
+    const isCorrectPassword = await this.passwordService.comparePassword(password, user.password);
     if (!isCorrectPassword) {
-      throw new HttpException(
-        'invalid email or password',
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new HttpException('invalid email or password', HttpStatus.UNAUTHORIZED);
     }
 
     if (user.status === UserStatus.ACTIVE) {
@@ -257,10 +238,7 @@ export class AuthService {
    * @throws {NotFoundException} If the user is not found.
    * @throws {BadRequestException} If the old password is incorrect.
    */
-  async changePassword(
-    userId: string,
-    changePasswordDTO: ChangePasswordDto,
-  ): Promise<User> {
+  async changePassword(userId: string, changePasswordDTO: ChangePasswordDto): Promise<User> {
     const { oldPassword, newPassword } = changePasswordDTO;
 
     // Fetch the user from the DB
@@ -282,8 +260,7 @@ export class AuthService {
     }
 
     // Encrypt the new password
-    const newEncryptedPassword: string =
-      await this.passwordService.encryptPassword(newPassword);
+    const newEncryptedPassword: string = await this.passwordService.encryptPassword(newPassword);
 
     // Update the user's password in the database
     const updatedUser: User = await this.userService.updateUser(user.id, {
@@ -361,8 +338,7 @@ export class AuthService {
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    const encryptedPassword =
-      await this.passwordService.encryptPassword(newPassword);
+    const encryptedPassword = await this.passwordService.encryptPassword(newPassword);
     await this.userService.updateUser(user.id, { password: encryptedPassword });
   }
 }

@@ -1,8 +1,5 @@
-import {
-  BadRequestException,
-  ValidationPipe,
-  ValidationError,
-} from '@nestjs/common';
+import type { ValidationError } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 
 export const DtoValidationPipe = new ValidationPipe({
   whitelist: true, // Strips properties not defined in the DTO

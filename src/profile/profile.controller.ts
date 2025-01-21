@@ -10,13 +10,7 @@ import {
   HttpStatus,
   UploadedFile,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiTags,
-  ApiResponse,
-  ApiConsumes,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfileService } from './profile.service';
@@ -51,10 +45,7 @@ export class ProfileController {
     type: User,
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
-  async updateProfile(
-    @Req() req,
-    @Body() updateProfileDto: UpdateProfileDto,
-  ): Promise<User> {
+  async updateProfile(@Req() req, @Body() updateProfileDto: UpdateProfileDto): Promise<User> {
     const userId = req.user.id;
     return this.profileService.updateProfile(userId, updateProfileDto);
   }
@@ -86,10 +77,7 @@ export class ProfileController {
     description: 'Invalid file type or size.',
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
-  async updateProfilePicture(
-    @Req() req,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<User> {
+  async updateProfilePicture(@Req() req, @UploadedFile() file: Express.Multer.File): Promise<User> {
     const userId = req.user.id;
     return this.profileService.updateProfilePicture(userId, file);
   }

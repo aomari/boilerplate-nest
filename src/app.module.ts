@@ -26,8 +26,7 @@ import { join } from 'path';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, databaseConfig],
-      envFilePath:
-        process.env.NODE_ENV === 'production' ? '.prod.env' : '.dev.env',
+      envFilePath: process.env.NODE_ENV === 'production' ? '.prod.env' : '.dev.env',
     }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({

@@ -85,11 +85,7 @@ export class OtpService {
    */
   private async sendOtpMail(params: SendOtpMailParams): Promise<boolean> {
     const { templateType, subject, recipientName, targetEmail, otp } = params;
-    const templatePath = path.join(
-      process.cwd(),
-      'src/common/template',
-      templateType,
-    );
+    const templatePath = path.join(process.cwd(), 'src/common/template', templateType);
     return await ejs.renderFile(
       templatePath,
       {
@@ -115,9 +111,7 @@ export class OtpService {
    * @param {GenerateAndSendOtpParams} params - Parameters for generating and sending the OTP.
    * @returns {Promise<GenerateAndSendOtpResponse>} Result of the OTP operation.
    */
-  async generateAndSendOtp(
-    params: GenerateAndSendOtpParams,
-  ): Promise<GenerateAndSendOtpResponse> {
+  async generateAndSendOtp(params: GenerateAndSendOtpParams): Promise<GenerateAndSendOtpResponse> {
     const { recipientName, targetEmail, otpType, userId } = params;
     try {
       const otp = this.generateOTP();
@@ -191,11 +185,7 @@ export class OtpService {
    * @param {number} otp - The OTP provided by the user.
    * @returns {Promise<boolean>} `true` if the OTP is valid, otherwise `false`.
    */
-  async isValidOtp(
-    userId: string,
-    otpType: OtpType,
-    otp: number,
-  ): Promise<boolean> {
+  async isValidOtp(userId: string, otpType: OtpType, otp: number): Promise<boolean> {
     const storedOtp = await this.otpRepository.findOne({
       where: {
         userId,
