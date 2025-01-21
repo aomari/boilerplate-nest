@@ -14,9 +14,15 @@ import { APP_GUARD } from '@nestjs/core';
 import { ProfileModule } from './profile/profile.module';
 import databaseConfig from './config/database.config';
 import appConfig from './config/app.config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'storage', 'profile-pictures'),
+      serveRoot: '/api/storage/profile-pictures',
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, databaseConfig],
