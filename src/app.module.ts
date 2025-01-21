@@ -16,6 +16,7 @@ import databaseConfig from './config/database.config';
 import appConfig from './config/app.config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { join } from 'path';
     MailModule,
     OtpModule,
     ProfileModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [
