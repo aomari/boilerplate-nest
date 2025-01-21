@@ -21,6 +21,7 @@ import {
 } from '../../auth/dto';
 import { OtpService, OtpType } from 'src/otp';
 import { ChangePasswordDto } from '../dto/change-password.dto';
+import { UserRole } from 'src/user/user-role.enum';
 
 /**
  * Service for managing user authentication processes, including sign-up, login, OTP verification, and token management.
@@ -57,7 +58,7 @@ export class AuthService {
    * @throws {HttpException} If the email or username already exists.
    */
   async signupService(signupDto: SignupDto): Promise<User> {
-    const { username, email, password } = signupDto;
+    const { username, email, password, role } = signupDto;
 
     let user = await this.userService.getUser({ email });
     if (user) {
@@ -76,6 +77,7 @@ export class AuthService {
       email,
       password: encryptedPassword,
       status: UserStatus.INACTIVE,
+      role: role || UserRole.USER, // Set default role to USER if not provided
     });
 
     this.otpService.generateAndSendOtp({
@@ -192,7 +194,9 @@ export class AuthService {
 
     if (user.status === UserStatus.ACTIVE) {
       const payload: TokenPayload = { email, id: user.id };
-      const access_token = this.jwtService.sign(payload);
+      const access_token = this.jwtService.sign(payload, {
+        expiresIn: this.configService.get<string>('JWT_EXPIRATION'),
+      });
       const refreshToken = this.jwtService.sign(payload, {
         expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
       });
@@ -223,10 +227,16 @@ export class AuthService {
   async refreshToken(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken);
-      const newAccessToken = this.jwtService.sign({
-        username: payload.username,
-        id: payload.id,
-      });
+      const newAccessToken = this.jwtService.sign(
+        {
+          username: payload.username,
+          id: payload.id,
+        },
+        {
+          expiresIn: this.configService.get<string>('JWT_EXPIRATION'),
+        },
+      );
+
       const newRefreshToken = this.jwtService.sign(payload, {
         expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
       });

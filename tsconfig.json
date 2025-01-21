@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["jest"],
+    "types": ["jest", "Multer"],
     "typeRoots": ["node_modules/@types"],
     "module": "commonjs",
     "declaration": true,
