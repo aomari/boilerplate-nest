@@ -1,12 +1,34 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthService } from './service';
 import { LoginDto, RefreshTokenDto, SignupDto } from './dto';
 import { ResendSignupDto } from './dto/resendSignup.dto';
 import { ResendSignupResponseDTO } from './dto/resendSignupResponse.dto';
 import { VerifySignupOtpDto } from './dto/verifySignupOtp.dto';
 import { VerifySignupOtpResponseDto } from './dto/verifySignupOtpResponse.dto';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { User } from 'src/user';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ForgetPasswordDto } from './dto/forget-password.dto';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -60,7 +82,7 @@ export class AuthController {
   @Post('verify-signup-otp')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'verify the otp for new user account',
+    summary: 'verify the otp for new user account (12345 for testing)',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -94,5 +116,70 @@ export class AuthController {
   @ApiBody({ type: RefreshTokenDto })
   async refreshToken(@Body() body: RefreshTokenDto) {
     return await this.authService.refreshToken(body.refreshToken);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Patch('change-password')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Password changed successfully.',
+    type: User,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Old password is incorrect.',
+  })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error.',
+  })
+  async changePassword(
+    @Req() req,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    const userId = req.user.id; // Extracted from JWT payload
+    return this.authService.changePassword(userId, changePasswordDto);
+  }
+
+  @Post('forget-password')
+  @ApiResponse({ status: HttpStatus.OK, description: 'OTP sent to email.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error.',
+  })
+  async forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {
+    const { email } = forgetPasswordDto;
+    const user = await this.authService.getUserByEmail(email);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    await this.authService.generateAndSendOtp(email);
+    return { message: 'OTP sent to email.' };
+  }
+
+  @Post('reset-password')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Password reset successfully.',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid OTP or email.',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error.',
+  })
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    const { email, otp, newPassword } = resetPasswordDto;
+    const isValidOtp = await this.authService.validateOtp(email, otp);
+    if (!isValidOtp) {
+      throw new HttpException('Invalid OTP or email', HttpStatus.BAD_REQUEST);
+    }
+    await this.authService.resetPassword(email, newPassword);
+    return { message: 'Password reset successfully.' };
   }
 }

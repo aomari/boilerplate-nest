@@ -7,5 +7,5 @@
  */
 export enum OtpType {
   SIGNUP_USER = 'SignUp', // OTP for user sign-up
-  FORGET_PASSWORD = 'ForgetPassword', // OTP for password recovery
+  RESET_PASSWORD = 'ResetPassword', // OTP for password recovery
 }

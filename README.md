@@ -93,10 +93,12 @@ The project uses the `@nestjs/throttler` package to implement rate limiting. Thi
 The following throttling strategies are configured in the project:
 
 1. **Short Term**:
+
    - **TTL**: 1 second
    - **Limit**: 3 requests
 
 2. **Medium Term**:
+
    - **TTL**: 10 seconds
    - **Limit**: 20 requests
 
@@ -114,17 +116,19 @@ The `ThrottlerGuard` is applied globally to all routes and controllers in the ap
 - **Fair Usage**: Ensures that all clients have fair access to the API by preventing any single client from monopolizing server resources.
 - **Easy Configuration**: Centralized configuration makes it easy to manage and adjust rate limiting settings as needed.
 
-
 ## GitHub Actions
 
 #### **Overview**
+
 This CI (Continuous Integration) pipeline automates various tasks to ensure code quality, security, and successful project builds. The pipeline triggers on:
+
 1. Pull requests targeting the `main` branch.
 2. Pushes directly to the `main` branch.
 
 #### **Workflow Steps**
+
 1. **Check out Repository**: Clones the repository into the runner environment.
-2. **Cache Node.js Modules**: 
+2. **Cache Node.js Modules**:
    - Speeds up workflow by reusing previously installed `node_modules`.
    - Cache is identified by the hash of the `yarn.lock` file.
 3. **Set up Node.js**:
@@ -139,20 +143,22 @@ This CI (Continuous Integration) pipeline automates various tasks to ensure code
 11. **(Optional) Generate Coverage Report**: Produces a report showing test coverage (currently commented out).
 
 #### **Customizations**
+
 - **Caching**: Optimizes dependency installation by caching the `node_modules` directory.
 - **Node.js Version**: Uses the latest LTS version for stability and long-term support.
 - **Extendable Steps**: The commented-out test and coverage steps can be activated if required.
 
 #### **Error Recovery**
+
 - The pipeline logs each step's output, aiding in debugging.
 - Failure in any step halts subsequent steps for quick resolution.
-
 
 ## How to Run the Project
 
 To run the project, follow these steps:
 
 1. **Run the Docker Image**:
+
    - Navigate to the `dockers` directory and start the Docker container using `docker-compose.yml`:
      ```bash
      cd dockers
@@ -160,6 +166,7 @@ To run the project, follow these steps:
      ```
 
 2. **Modify Database Configurations**:
+
    - Update the `.env.dev` file with the following database configurations to match the Docker image:
      ```env
      DB_HOST=localhost
@@ -170,27 +177,30 @@ To run the project, follow these steps:
      ```
 
 3. **Install Dependencies**:
+
    - Install the required project dependencies using Yarn:
      ```bash
      yarn install
      ```
 
 4. **Start the Project in Development Mode**:
+
    - Start the project in development mode:
      ```bash
      yarn start:dev
      ```
 
 5. **Access Swagger Documentation**:
-   - Open your browser and navigate to [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to access the Swagger documentation.
-
+   - Open your browser and navigate to [http://localhost:3000/api](http://localhost:3000/api) to access the Swagger documentation.
 
 ## How to Generate Technical Documentation
 
 To generate the technical documentation for the project, follow these steps:
 
 1. **Generate Documentation**:
+
    - Run the following command to generate the documentation:
+
      ```bash
      yarn docs
      ```

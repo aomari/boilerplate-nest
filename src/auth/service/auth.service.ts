@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserService, UserStatus } from 'src/user';
 import { ConfigService } from '@nestjs/config';
@@ -12,8 +18,10 @@ import {
   VerifySignupOtpResponseDto,
   VerifySignupOtpDto,
   ResendSignupResponseDTO,
-} from '../dto';
+} from '../../auth/dto';
 import { OtpService, OtpType } from 'src/otp';
+import { ChangePasswordDto } from '../dto/change-password.dto';
+import { UserRole } from 'src/user/user-role.enum';
 
 /**
  * Service for managing user authentication processes, including sign-up, login, OTP verification, and token management.
@@ -50,7 +58,7 @@ export class AuthService {
    * @throws {HttpException} If the email or username already exists.
    */
   async signupService(signupDto: SignupDto): Promise<User> {
-    const { username, email, password } = signupDto;
+    const { username, email, password, role } = signupDto;
 
     let user = await this.userService.getUser({ email });
     if (user) {
@@ -69,6 +77,7 @@ export class AuthService {
       email,
       password: encryptedPassword,
       status: UserStatus.INACTIVE,
+      role: role || UserRole.USER, // Set default role to USER if not provided
     });
 
     this.otpService.generateAndSendOtp({
@@ -136,6 +145,14 @@ export class AuthService {
       otp,
     );
     if (isValidOTP) {
+      const updatedUser = await this.userService.updateUser(user.id, {
+        status: UserStatus.ACTIVE,
+      });
+
+      // Validate the return value
+      if (updatedUser.status !== UserStatus.ACTIVE) {
+        throw new Error('Failed to update user status to ACTIVE');
+      }
       return {
         message: 'OTP verified successfully.',
       };
@@ -177,10 +194,15 @@ export class AuthService {
 
     if (user.status === UserStatus.ACTIVE) {
       const payload: TokenPayload = { email, id: user.id };
-      const access_token = this.jwtService.sign(payload);
+      const access_token = this.jwtService.sign(payload, {
+        expiresIn: this.configService.get<string>('JWT_EXPIRATION'),
+      });
       const refreshToken = this.jwtService.sign(payload, {
         expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
       });
+
+      // Exclude the password field from the returned user object
+      delete user.password;
 
       return {
         user,
@@ -205,10 +227,16 @@ export class AuthService {
   async refreshToken(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken);
-      const newAccessToken = this.jwtService.sign({
-        username: payload.username,
-        id: payload.id,
-      });
+      const newAccessToken = this.jwtService.sign(
+        {
+          username: payload.username,
+          id: payload.id,
+        },
+        {
+          expiresIn: this.configService.get<string>('JWT_EXPIRATION'),
+        },
+      );
+
       const newRefreshToken = this.jwtService.sign(payload, {
         expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
       });
@@ -217,5 +245,124 @@ export class AuthService {
     } catch {
       throw new HttpException('Invalid refresh token', HttpStatus.UNAUTHORIZED);
     }
+  }
+
+  /**
+   * Changes the password for a user.
+   *
+   * @async
+   * @param {string} userId - The ID of the user.
+   * @param {ChangePasswordDto} changePasswordDTO - Data transfer object containing old and new passwords.
+   * @returns {Promise<User>} The updated user entity without the password field.
+   * @throws {NotFoundException} If the user is not found.
+   * @throws {BadRequestException} If the old password is incorrect.
+   */
+  async changePassword(
+    userId: string,
+    changePasswordDTO: ChangePasswordDto,
+  ): Promise<User> {
+    const { oldPassword, newPassword } = changePasswordDTO;
+
+    // Fetch the user from the DB
+    const user = await this.userService.getUser({ id: userId });
+
+    // Check if the user exists
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if the encrypted old password matches the stored password
+    const isCorrectOldPassword = await this.passwordService.comparePassword(
+      oldPassword,
+      user.password,
+    );
+
+    if (!isCorrectOldPassword) {
+      throw new BadRequestException('Old password is incorrect');
+    }
+
+    // Encrypt the new password
+    const newEncryptedPassword: string =
+      await this.passwordService.encryptPassword(newPassword);
+
+    // Update the user's password in the database
+    const updatedUser: User = await this.userService.updateUser(user.id, {
+      password: newEncryptedPassword,
+    });
+
+    // Delete the password field from the response object
+    delete updatedUser.password;
+
+    // Return the updated user object without the password
+    return updatedUser;
+  }
+
+  /**
+   * Retrieves a user by their email address.
+   *
+   * @async
+   * @param {string} email - The email address of the user.
+   * @returns {Promise<User>} The user entity.
+   * @throws {HttpException} If the user is not found.
+   */
+  async getUserByEmail(email: string): Promise<User> {
+    return this.userService.getUser({ email });
+  }
+
+  /**
+   * Generates and sends an OTP to the user's email address.
+   *
+   * @async
+   * @param {string} email - The email address of the user.
+   * @returns {Promise<void>}
+   * @throws {HttpException} If the user is not found.
+   */
+  async generateAndSendOtp(email: string): Promise<void> {
+    const user = await this.userService.getUser({ email });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    await this.otpService.generateAndSendOtp({
+      otpType: OtpType.RESET_PASSWORD,
+      recipientName: user.username,
+      targetEmail: email,
+      userId: user.id,
+    });
+  }
+
+  /**
+   * Validates the OTP for the given email address.
+   *
+   * @async
+   * @param {string} email - The email address of the user.
+   * @param {number} otp - The OTP to validate.
+   * @returns {Promise<boolean>} True if the OTP is valid, false otherwise.
+   * @throws {HttpException} If the user is not found.
+   */
+  async validateOtp(email: string, otp: number): Promise<boolean> {
+    const user = await this.userService.getUser({ email });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return this.otpService.isValidOtp(user.id, OtpType.RESET_PASSWORD, otp);
+  }
+
+  /**
+   * Resets the user's password.
+   *
+   * @async
+   * @param {string} email - The email address of the user.
+   * @param {string} newPassword - The new password to set.
+   * @returns {Promise<void>}
+   * @throws {HttpException} If the user is not found.
+   */
+  async resetPassword(email: string, newPassword: string): Promise<void> {
+    const user = await this.userService.getUser({ email });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    const encryptedPassword =
+      await this.passwordService.encryptPassword(newPassword);
+    await this.userService.updateUser(user.id, { password: encryptedPassword });
   }
 }

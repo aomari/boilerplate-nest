@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
-    "types": [
-      "jest"
-    ],
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "types": ["jest", "Multer"],
+    "typeRoots": ["node_modules/@types"],
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -22,6 +18,8 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
+    "noFallthroughCasesInSwitch": false
   },
+  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

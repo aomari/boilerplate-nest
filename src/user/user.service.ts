@@ -12,7 +12,12 @@ export class UserService {
 
   async createUser(user: User): Promise<User> {
     const newUser = this.userRepository.create(user);
-    return await this.userRepository.save(newUser);
+    const savedUser = await this.userRepository.save(newUser);
+
+    // Exclude the password field from the returned user object
+    delete savedUser.password;
+
+    return savedUser;
   }
 
   async getUser(getUser: {
@@ -27,5 +32,10 @@ export class UserService {
         username: getUser.username,
       },
     });
+  }
+
+  async updateUser(id: string, updateUser: Partial<User>): Promise<User> {
+    await this.userRepository.update(id, updateUser);
+    return await this.userRepository.findOne({ where: { id } });
   }
 }

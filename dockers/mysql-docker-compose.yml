@@ -6,12 +6,12 @@ services:
     container_name: mysql-container
     restart: always
     ports:
-      - "3307:3306" # Expose port 3306 to the host
+      - '3307:3306' # Expose port 3306 to the host
     environment:
       MYSQL_ROOT_PASSWORD: root_password # Root password
-      MYSQL_DATABASE: nestjs_db          # Database name
-      MYSQL_USER: nestjs_user            # Username
-      MYSQL_PASSWORD: nestjs_password    # User password
+      MYSQL_DATABASE: nestjs_db # Database name
+      MYSQL_USER: nestjs_user # Username
+      MYSQL_PASSWORD: nestjs_password # User password
     volumes:
       - mysql-data:/var/lib/mysql # Persist MySQL data
     networks:
