@@ -1,5 +1,6 @@
 import { Otp } from 'src/otp';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { UserRole } from './user-role.enum';
 
 @Entity('users')
 export class User {
@@ -31,4 +32,11 @@ export class User {
 
   @Column({ nullable: true })
   profilePicture?: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
 }
