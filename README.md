@@ -7,7 +7,7 @@
 
 # Boilerplate NestJS
 
-![GitHub Actions Status](https://github.com/aomari/boilerplate-nest/actions/workflows/ci.yml/badge.svg)
+![GitHub Actions Status](https://img.shields.io/github/workflow/status/aomari/boilerplate-nest/ci)
 
 A NestJS boilerplate for building scalable and maintainable backend applications. Includes authentication, authorization, and common utilities.
 
