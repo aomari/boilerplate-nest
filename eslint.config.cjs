@@ -16,12 +16,7 @@ module.exports = [
       '@typescript-eslint': tsPlugin,
       prettier: prettierPlugin,
     },
-    ignores: [
-        "node_modules/",
-        "build/",
-        "dist/**",
-        '**/*.d.ts'
-    ],
+    ignores: ['node_modules/', 'build/', 'dist/**', '**/*.d.ts'],
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/explicit-function-return-type': 'off',

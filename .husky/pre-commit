@@ -1,14 +1,11 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Lint staged files
-npx lint-staged
 
 # Check TypeScript types
 npx tsc --noEmit
 
-# Run tests
-npx jest --bail --findRelatedTests
+npx eslint . --fix
 
 # Format staged files
 npx prettier --write .

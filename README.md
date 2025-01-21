@@ -5,7 +5,6 @@
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
-
 # Boilerplate NestJS
 
 ![GitHub Actions Status](https://github.com/aomari/boilerplate-nest/actions/workflows/ci.yml/badge.svg)
@@ -228,7 +227,6 @@ To generate the technical documentation for the project, follow these steps:
    - Once the documentation is generated, you can access it by opening the docs/index.html file in your browser.
 
 By following these steps, you will be able to generate and access the technical documentation for the project.
-
 
 ## Contact
 
