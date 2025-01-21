@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserService, UserStatus } from 'src/user';
 import { ConfigService } from '@nestjs/config';
@@ -22,6 +16,9 @@ import {
 import { OtpService, OtpType } from 'src/otp';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import { UserRole } from 'src/user/user-role.enum';
+import { ConflictException } from 'src/exceptions/conflict.exception';
+import { ResourceNotFoundException } from 'src/exceptions/resource-not-found.exception';
+import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
 
 /**
  * Service for managing user authentication processes, including sign-up, login, OTP verification, and token management.
@@ -55,18 +52,18 @@ export class AuthService {
    * @async
    * @param {SignupDto} signupDto - Data transfer object containing user sign-up details.
    * @returns {Promise<User>} The created user entity.
-   * @throws {HttpException} If the email or username already exists.
+   * @throws {ConflictException} If the email or username already exists.
    */
   async signupService(signupDto: SignupDto): Promise<User> {
     const { username, email, password, role } = signupDto;
 
     let user = await this.userService.getUser({ email });
     if (user) {
-      throw new HttpException('email already exist', HttpStatus.CONFLICT);
+      throw new ConflictException('email already exist');
     }
     user = await this.userService.getUser({ username });
     if (user) {
-      throw new HttpException('username already exist', HttpStatus.CONFLICT);
+      throw new ConflictException('username already exist');
     }
 
     const encryptedPassword = await this.passwordService.encryptPassword(password);
@@ -95,14 +92,14 @@ export class AuthService {
    * @async
    * @param {ResendSignupDto} resendSignupDto - Data transfer object containing user email for OTP resend.
    * @returns {Promise<ResendSignupResponseDTO>} Response object indicating OTP resend status.
-   * @throws {HttpException} If the user is not found.
+   * @throws {NotFoundException} If the user is not found.
    */
   async resendSignupService(resendSignupDto: ResendSignupDto): Promise<ResendSignupResponseDTO> {
     const { email } = resendSignupDto;
 
     const user = await this.userService.getUser({ email });
     if (!user) {
-      throw new HttpException('Not found user', HttpStatus.NOT_FOUND);
+      throw new ResourceNotFoundException('Not found user');
     }
 
     const res = await this.otpService.generateAndSendOtp({
@@ -126,7 +123,7 @@ export class AuthService {
    * @async
    * @param {VerifySignupOtpDto} verifySignupOtpDto - Data transfer object containing user email and OTP for verification.
    * @returns {Promise<VerifySignupOtpResponseDto>} Response object indicating OTP verification status.
-   * @throws {HttpException} If the user is not found or OTP verification fails.
+   * @throws {ResourceNotFoundException} If the user is not found or OTP verification fails.
    */
   async verifySignupOtpService(
     verifySignupOtpDto: VerifySignupOtpDto,
@@ -134,7 +131,7 @@ export class AuthService {
     const { email, otp } = verifySignupOtpDto;
     const user = await this.userService.getUser({ email });
     if (!user) {
-      throw new HttpException('Not found user', HttpStatus.NOT_FOUND);
+      throw new ResourceNotFoundException('Not found user');
     }
     const isValidOTP = await this.otpService.isValidOtp(user.id, OtpType.SIGNUP_USER, otp);
     if (isValidOTP) {
@@ -150,7 +147,7 @@ export class AuthService {
         message: 'OTP verified successfully.',
       };
     } else {
-      throw new HttpException('OTP verification failed.', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('OTP verification failed.');
     }
   }
 
@@ -160,17 +157,17 @@ export class AuthService {
    * @async
    * @param {LoginDto} loginDto - Data transfer object containing user login details.
    * @returns {Promise<{ user: User; access_token: string; refreshToken: string; }>} Tokens and user information.
-   * @throws {HttpException} If credentials are invalid or the user account is inactive.
+   * @throws {UnauthorizedException} If credentials are invalid or the user account is inactive.
    */
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
     const user = await this.userService.getUser({ email });
     if (!user) {
-      throw new HttpException('invalid email or password', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException('invalid email or password');
     }
     const isCorrectPassword = await this.passwordService.comparePassword(password, user.password);
     if (!isCorrectPassword) {
-      throw new HttpException('invalid email or password', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException('invalid email or password');
     }
 
     if (user.status === UserStatus.ACTIVE) {
@@ -191,10 +188,7 @@ export class AuthService {
         refreshToken,
       };
     } else {
-      throw new HttpException(
-        'Your account is inactive. Please activate it to proceed.',
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new UnauthorizedException('Your account is inactive. Please activate it to proceed.');
     }
   }
   /**
@@ -203,7 +197,7 @@ export class AuthService {
    * @async
    * @param {string} refreshToken - The user's refresh token.
    * @returns {Promise<{ accessToken: string; refreshToken: string }>} New tokens.
-   * @throws {HttpException} If the refresh token is invalid.
+   * @throws {UnauthorizedException} If the refresh token is invalid.
    */
   async refreshToken(refreshToken: string) {
     try {
@@ -224,7 +218,7 @@ export class AuthService {
 
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     } catch {
-      throw new HttpException('Invalid refresh token', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException('Invalid refresh token');
     }
   }
 
@@ -235,7 +229,7 @@ export class AuthService {
    * @param {string} userId - The ID of the user.
    * @param {ChangePasswordDto} changePasswordDTO - Data transfer object containing old and new passwords.
    * @returns {Promise<User>} The updated user entity without the password field.
-   * @throws {NotFoundException} If the user is not found.
+   * @throws {ResourceNotFoundException} If the user is not found.
    * @throws {BadRequestException} If the old password is incorrect.
    */
   async changePassword(userId: string, changePasswordDTO: ChangePasswordDto): Promise<User> {
@@ -246,7 +240,7 @@ export class AuthService {
 
     // Check if the user exists
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new ResourceNotFoundException('User not found');
     }
 
     // Check if the encrypted old password matches the stored password
@@ -292,12 +286,12 @@ export class AuthService {
    * @async
    * @param {string} email - The email address of the user.
    * @returns {Promise<void>}
-   * @throws {HttpException} If the user is not found.
+   * @throws {ResourceNotFoundException} If the user is not found.
    */
   async generateAndSendOtp(email: string): Promise<void> {
     const user = await this.userService.getUser({ email });
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new ResourceNotFoundException('User not found');
     }
     await this.otpService.generateAndSendOtp({
       otpType: OtpType.RESET_PASSWORD,
@@ -314,12 +308,12 @@ export class AuthService {
    * @param {string} email - The email address of the user.
    * @param {number} otp - The OTP to validate.
    * @returns {Promise<boolean>} True if the OTP is valid, false otherwise.
-   * @throws {HttpException} If the user is not found.
+   * @throws {ResourceNotFoundException} If the user is not found.
    */
   async validateOtp(email: string, otp: number): Promise<boolean> {
     const user = await this.userService.getUser({ email });
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new ResourceNotFoundException('User not found');
     }
     return this.otpService.isValidOtp(user.id, OtpType.RESET_PASSWORD, otp);
   }
@@ -331,12 +325,12 @@ export class AuthService {
    * @param {string} email - The email address of the user.
    * @param {string} newPassword - The new password to set.
    * @returns {Promise<void>}
-   * @throws {HttpException} If the user is not found.
+   * @throws {ResourceNotFoundException} If the user is not found.
    */
   async resetPassword(email: string, newPassword: string): Promise<void> {
     const user = await this.userService.getUser({ email });
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new ResourceNotFoundException('User not found');
     }
     const encryptedPassword = await this.passwordService.encryptPassword(newPassword);
     await this.userService.updateUser(user.id, { password: encryptedPassword });

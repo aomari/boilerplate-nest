@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   HttpCode,
-  HttpException,
   HttpStatus,
   Patch,
   Post,
@@ -21,6 +20,8 @@ import { User } from 'src/user';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
+import { ResourceNotFoundException } from 'src/exceptions/resource-not-found.exception';
+import { BadRequestException } from 'src/exceptions/bad-request.exception';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -143,7 +144,7 @@ export class AuthController {
     const { email } = forgetPasswordDto;
     const user = await this.authService.getUserByEmail(email);
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new ResourceNotFoundException('User not found');
     }
     await this.authService.generateAndSendOtp(email);
     return { message: 'OTP sent to email.' };
@@ -166,7 +167,7 @@ export class AuthController {
     const { email, otp, newPassword } = resetPasswordDto;
     const isValidOtp = await this.authService.validateOtp(email, otp);
     if (!isValidOtp) {
-      throw new HttpException('Invalid OTP or email', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid OTP or email');
     }
     await this.authService.resetPassword(email, newPassword);
     return { message: 'Password reset successfully.' };

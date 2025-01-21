@@ -91,6 +91,7 @@ npm install @nestjs/terminus @nestjs/axios axios
 The health check endpoint allows you to verify the status of the application and its connected resources.
 
 ### Available Health Checks
+
 When accessing the `/health` endpoint, the following checks are performed:
 
 1. **HTTP Ping Check**: Pings the NestJS documentation site to ensure the HTTP service is working.
@@ -109,14 +110,19 @@ curl http://localhost:3000/health
 The response will provide the status of the health checks, showing whether each check has passed or failed.
 
 ### Step 8: Verify Health Check
+
 1. Start your application by running the following command:
+
 ```sh
 npm run start:dev
 ```
+
 2. Verify the health check status by visiting the following URL in your browser or using curl:
+
 ```sh
 curl http://localhost:3000/health
 ```
+
 Or simply open the URL in your browser: http://localhost:3000/health.
 
 3. You should receive a response indicating the status of the health checks, confirming that your application and database are reachable and operational.
