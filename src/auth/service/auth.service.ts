@@ -19,6 +19,7 @@ import { UserRole } from 'src/user/user-role.enum';
 import { ConflictException } from 'src/exceptions/conflict.exception';
 import { ResourceNotFoundException } from 'src/exceptions/resource-not-found.exception';
 import { UnauthorizedException } from 'src/exceptions/unauthorized.exception';
+import { I18nService } from 'nestjs-i18n';
 
 /**
  * Service for managing user authentication processes, including sign-up, login, OTP verification, and token management.
@@ -39,6 +40,7 @@ export class AuthService {
    * @param {OtpService} otpService
    */
   constructor(
+    private readonly i18n: I18nService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly userService: UserService,
@@ -59,11 +61,11 @@ export class AuthService {
 
     let user = await this.userService.getUser({ email });
     if (user) {
-      throw new ConflictException('email already exist');
+      throw new ConflictException(await this.i18n.translate('auth.emailAlreadyExist'));
     }
     user = await this.userService.getUser({ username });
     if (user) {
-      throw new ConflictException('username already exist');
+      throw new ConflictException(await this.i18n.translate('auth.usernameAlreadyExist'));
     }
 
     const encryptedPassword = await this.passwordService.encryptPassword(password);
@@ -99,7 +101,7 @@ export class AuthService {
 
     const user = await this.userService.getUser({ email });
     if (!user) {
-      throw new ResourceNotFoundException('Not found user');
+      throw new ResourceNotFoundException(await this.i18n.translate('common.notFoundUser'));
     }
 
     const res = await this.otpService.generateAndSendOtp({
@@ -131,7 +133,7 @@ export class AuthService {
     const { email, otp } = verifySignupOtpDto;
     const user = await this.userService.getUser({ email });
     if (!user) {
-      throw new ResourceNotFoundException('Not found user');
+      throw new ResourceNotFoundException(await this.i18n.translate('common.notFoundUser'));
     }
     const isValidOTP = await this.otpService.isValidOtp(user.id, OtpType.SIGNUP_USER, otp);
     if (isValidOTP) {
@@ -141,13 +143,13 @@ export class AuthService {
 
       // Validate the return value
       if (updatedUser.status !== UserStatus.ACTIVE) {
-        throw new Error('Failed to update user status to ACTIVE');
+        throw new Error(await this.i18n.translate('auth.failedToUpdateUserStatusToActive'));
       }
       return {
-        message: 'OTP verified successfully.',
+        message: await this.i18n.translate('auth.otpVerifiedSuccessfully'),
       };
     } else {
-      throw new BadRequestException('OTP verification failed.');
+      throw new BadRequestException(await this.i18n.translate('auth.otpVerificationFailed'));
     }
   }
 
@@ -163,11 +165,11 @@ export class AuthService {
     const { email, password } = loginDto;
     const user = await this.userService.getUser({ email });
     if (!user) {
-      throw new UnauthorizedException('invalid email or password');
+      throw new UnauthorizedException(await this.i18n.translate('auth.invalidEmailOrPassword'));
     }
     const isCorrectPassword = await this.passwordService.comparePassword(password, user.password);
     if (!isCorrectPassword) {
-      throw new UnauthorizedException('invalid email or password');
+      throw new UnauthorizedException(await this.i18n.translate('auth.invalidEmailOrPassword'));
     }
 
     if (user.status === UserStatus.ACTIVE) {
@@ -188,7 +190,7 @@ export class AuthService {
         refreshToken,
       };
     } else {
-      throw new UnauthorizedException('Your account is inactive. Please activate it to proceed.');
+      throw new UnauthorizedException(await this.i18n.translate('auth.accountInactive'));
     }
   }
   /**
@@ -218,7 +220,7 @@ export class AuthService {
 
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     } catch {
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedException(await this.i18n.translate('auth.invalidRefreshToken'));
     }
   }
 
@@ -240,7 +242,7 @@ export class AuthService {
 
     // Check if the user exists
     if (!user) {
-      throw new ResourceNotFoundException('User not found');
+      throw new ResourceNotFoundException(await this.i18n.translate('common.notFoundUser'));
     }
 
     // Check if the encrypted old password matches the stored password
@@ -250,7 +252,7 @@ export class AuthService {
     );
 
     if (!isCorrectOldPassword) {
-      throw new BadRequestException('Old password is incorrect');
+      throw new BadRequestException(await this.i18n.translate('auth.oldPasswordIncorrect'));
     }
 
     // Encrypt the new password
@@ -291,7 +293,7 @@ export class AuthService {
   async generateAndSendOtp(email: string): Promise<void> {
     const user = await this.userService.getUser({ email });
     if (!user) {
-      throw new ResourceNotFoundException('User not found');
+      throw new ResourceNotFoundException(await this.i18n.translate('common.notFoundUser'));
     }
     await this.otpService.generateAndSendOtp({
       otpType: OtpType.RESET_PASSWORD,

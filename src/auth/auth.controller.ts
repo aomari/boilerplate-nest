@@ -8,7 +8,14 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiHeader,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthService } from './service';
 import { LoginDto, RefreshTokenDto, SignupDto } from './dto';
 import { ResendSignupDto } from './dto/resendSignup.dto';
@@ -28,6 +35,15 @@ import { BadRequestException } from 'src/exceptions/bad-request.exception';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('signup')
+  @ApiHeader({
+    name: 'Accept-Language',
+    description: 'Preferred language for the API response (options: en, ar)',
+    required: false,
+    schema: {
+      type: 'string',
+      default: 'en',
+    },
+  })
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create new account by Sign Up with your credentials',
@@ -50,6 +66,15 @@ export class AuthController {
   }
 
   @Post('resend-signup-otp')
+  @ApiHeader({
+    name: 'Accept-Language',
+    description: 'Preferred language for the API response (options: en, ar)',
+    required: false,
+    schema: {
+      type: 'string',
+      default: 'en',
+    },
+  })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'resend the otp for new user account',
@@ -73,6 +98,15 @@ export class AuthController {
   }
 
   @Post('verify-signup-otp')
+  @ApiHeader({
+    name: 'Accept-Language',
+    description: 'Preferred language for the API response (options: en, ar)',
+    required: false,
+    schema: {
+      type: 'string',
+      default: 'en',
+    },
+  })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'verify the otp for new user account (12345 for testing)',
@@ -98,6 +132,15 @@ export class AuthController {
   }
 
   @Post('login')
+  @ApiHeader({
+    name: 'Accept-Language',
+    description: 'Preferred language for the API response (options: en, ar)',
+    required: false,
+    schema: {
+      type: 'string',
+      default: 'en',
+    },
+  })
   @HttpCode(HttpStatus.OK)
   @ApiBody({ type: LoginDto })
   login(@Body() loginDto: LoginDto) {
@@ -114,6 +157,15 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Patch('change-password')
+  @ApiHeader({
+    name: 'Accept-Language',
+    description: 'Preferred language for the API response (options: en, ar)',
+    required: false,
+    schema: {
+      type: 'string',
+      default: 'en',
+    },
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Password changed successfully.',
@@ -134,6 +186,15 @@ export class AuthController {
   }
 
   @Post('forget-password')
+  @ApiHeader({
+    name: 'Accept-Language',
+    description: 'Preferred language for the API response (options: en, ar)',
+    required: false,
+    schema: {
+      type: 'string',
+      default: 'en',
+    },
+  })
   @ApiResponse({ status: HttpStatus.OK, description: 'OTP sent to email.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
   @ApiResponse({
@@ -151,6 +212,15 @@ export class AuthController {
   }
 
   @Post('reset-password')
+  @ApiHeader({
+    name: 'Accept-Language',
+    description: 'Preferred language for the API response (options: en, ar)',
+    required: false,
+    schema: {
+      type: 'string',
+      default: 'en',
+    },
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Password reset successfully.',

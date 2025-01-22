@@ -1,0 +1,7 @@
+{
+  "HELLO": "مرحبا",
+  "WELCOME": "مرحبًا بكم في تطبيقنا",
+  "notFoundUser": "المستخدم غير موجود",
+  "fileSizeExceeded": "يجب ألا يتجاوز حجم الملف {{size}} ميغابايت",
+  "invalidFileType": "نوع الملف غير صالح. يُسمح فقط بـ PNG و JPEG و JPG"
+}

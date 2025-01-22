@@ -10,7 +10,14 @@ import {
   HttpStatus,
   UploadedFile,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiResponse,
+  ApiConsumes,
+  ApiBody,
+  ApiHeader,
+} from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfileService } from './profile.service';
@@ -23,6 +30,15 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @Get()
+  @ApiHeader({
+    name: 'Accept-Language',
+    description: 'Preferred language for the API response (options: en, ar)',
+    required: false,
+    schema: {
+      type: 'string',
+      default: 'en',
+    },
+  })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiResponse({
@@ -37,6 +53,15 @@ export class ProfileController {
   }
 
   @Put()
+  @ApiHeader({
+    name: 'Accept-Language',
+    description: 'Preferred language for the API response (options: en, ar)',
+    required: false,
+    schema: {
+      type: 'string',
+      default: 'en',
+    },
+  })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @ApiResponse({
@@ -51,6 +76,15 @@ export class ProfileController {
   }
 
   @Post('profile-picture')
+  @ApiHeader({
+    name: 'Accept-Language',
+    description: 'Preferred language for the API response (options: en, ar)',
+    required: false,
+    schema: {
+      type: 'string',
+      default: 'en',
+    },
+  })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('file'))

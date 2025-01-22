@@ -6,10 +6,14 @@ import { join } from 'path';
 import { existsSync, mkdirSync, promises as fsPromises } from 'fs';
 import { ResourceNotFoundException } from 'src/exceptions/resource-not-found.exception';
 import { BadRequestException } from 'src/exceptions/bad-request.exception';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class ProfileService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly i18n: I18nService,
+    private readonly userService: UserService,
+  ) {}
 
   /**
    * Retrieves the profile of the user by their ID.
@@ -20,7 +24,7 @@ export class ProfileService {
   async getProfile(userId: string): Promise<User> {
     const user = await this.userService.getUser({ id: userId });
     if (!user) {
-      throw new ResourceNotFoundException('User not found');
+      throw new ResourceNotFoundException(await this.i18n.translate('common.notFoundUser'));
     }
 
     // Delete the password field from the response object
@@ -39,7 +43,7 @@ export class ProfileService {
   async updateProfile(userId: string, updateProfileDto: UpdateProfileDto): Promise<User> {
     const user = await this.userService.getUser({ id: userId });
     if (!user) {
-      throw new ResourceNotFoundException('User not found');
+      throw new ResourceNotFoundException(await this.i18n.translate('common.notFoundUser'));
     }
 
     const updatedUser = await this.userService.updateUser(userId, updateProfileDto);
@@ -58,20 +62,22 @@ export class ProfileService {
   async updateProfilePicture(userId: string, file: Express.Multer.File): Promise<User> {
     const user = await this.userService.getUser({ id: userId });
     if (!user) {
-      throw new ResourceNotFoundException('User not found');
+      throw new ResourceNotFoundException(await this.i18n.translate('common.notFoundUser'));
     }
 
     // Validate file size
     if (file.size > 15 * 1024 * 1024) {
       // 15 MB
-      throw new BadRequestException('File size should not exceed 15 MB');
+      throw new BadRequestException(
+        await this.i18n.translate('common.fileSizeExceeded', { args: { size: 15 } }),
+      );
     }
 
     // Validate file extension
     const validExtensions = ['png', 'jpeg', 'jpg'];
     const fileExtension = file.originalname.split('.').pop().toLowerCase();
     if (!validExtensions.includes(fileExtension)) {
-      throw new BadRequestException('Invalid file type. Only PNG, JPEG, and JPG are allowed');
+      throw new BadRequestException(await this.i18n.translate('common.invalidFileType'));
     }
 
     // Ensure the storage directory exists
