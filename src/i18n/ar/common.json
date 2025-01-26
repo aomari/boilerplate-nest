@@ -3,5 +3,10 @@
   "WELCOME": "مرحبًا بكم في تطبيقنا",
   "notFoundUser": "المستخدم غير موجود",
   "fileSizeExceeded": "يجب ألا يتجاوز حجم الملف {{size}} ميغابايت",
-  "invalidFileType": "نوع الملف غير صالح. يُسمح فقط بـ PNG و JPEG و JPG"
+  "invalidFileType": "نوع الملف غير صالح. يُسمح فقط بـ PNG و JPEG و JPG",
+  "user": {
+    "createdSuccessfully": "تم إنشاء المستخدم بنجاح",
+    "updatedSuccessfully": "تم تحديث المستخدم بنجاح",
+    "deletedSuccessfully": "تم حذف المستخدم بنجاح"
+  }
 }

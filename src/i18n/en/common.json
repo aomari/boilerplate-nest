@@ -3,5 +3,10 @@
   "WELCOME": "Welcome to our application",
   "notFoundUser": "User not found",
   "fileSizeExceeded": "File size should not exceed {{size}} MB",
-  "invalidFileType": "Invalid file type. Only PNG, JPEG, and JPG are allowed"
+  "invalidFileType": "Invalid file type. Only PNG, JPEG, and JPG are allowed",
+  "user": {
+    "createdSuccessfully": "User created successfully",
+    "updatedSuccessfully": "User updated successfully",
+    "deletedSuccessfully": "User deleted successfully"
+  }
 }

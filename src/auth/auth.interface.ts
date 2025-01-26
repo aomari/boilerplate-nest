@@ -1,3 +1,5 @@
+import type { UserRole } from 'src/user/user-role.enum';
+
 /**
  * Represents the payload data contained in a token, typically used for authentication
  * and authorization purposes.
@@ -19,4 +21,11 @@ export interface TokenPayload {
    * @type {string}
    */
   id: string;
+
+  /**
+   * The role of the user.
+   *
+   * @type {UserRole}
+   */
+  role: UserRole;
 }

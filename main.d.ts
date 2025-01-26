@@ -215,9 +215,11 @@ declare module 'auth/service/password.service' {
   }
 }
 declare module 'auth/auth.interface' {
+  import { UserRole } from 'user/user-role.enum';
   export interface TokenPayload {
     email: string;
     id: string;
+    role: UserRole;
   }
 }
 declare module 'auth/dto/resendSignup.dto' {

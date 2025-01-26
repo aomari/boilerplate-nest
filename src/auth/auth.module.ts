@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService, PasswordService } from './service';
@@ -9,6 +9,7 @@ import { OtpModule } from 'src/otp';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { RolesGuard } from 'src/guards/roles.guard';
 
 @Module({
   imports: [
@@ -24,11 +25,11 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       }),
     }),
     LoggerModule,
-    UserModule,
+    forwardRef(() => UserModule),
     OtpModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, PasswordService],
-  exports: [AuthService, JwtStrategy, PassportModule],
+  providers: [AuthService, JwtStrategy, PasswordService, RolesGuard],
+  exports: [AuthService, JwtStrategy, PassportModule, JwtModule, RolesGuard],
 })
 export class AuthModule {}

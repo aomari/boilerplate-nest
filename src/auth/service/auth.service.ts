@@ -173,7 +173,7 @@ export class AuthService {
     }
 
     if (user.status === UserStatus.ACTIVE) {
-      const payload: TokenPayload = { email, id: user.id };
+      const payload: TokenPayload = { email, id: user.id, role: user.role };
       const access_token = this.jwtService.sign(payload, {
         expiresIn: this.configService.get<string>('JWT_EXPIRATION'),
       });
