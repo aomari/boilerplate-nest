@@ -20,6 +20,7 @@ import { HealthModule } from './health/health.module';
 import * as path from 'path';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 import { LanguageMiddleware } from './middlewares/LanguageMiddleware';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -78,6 +79,7 @@ import { LanguageMiddleware } from './middlewares/LanguageMiddleware';
     OtpModule,
     ProfileModule,
     HealthModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [
