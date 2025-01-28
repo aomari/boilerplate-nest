@@ -23,7 +23,7 @@ import { ResendSignupResponseDTO } from './dto/resendSignupResponse.dto';
 import { VerifySignupOtpDto } from './dto/verifySignupOtp.dto';
 import { VerifySignupOtpResponseDto } from './dto/verifySignupOtpResponse.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
-import { User } from 'src/user';
+import { User } from 'src/user/user.entity';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';

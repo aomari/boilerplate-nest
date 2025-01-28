@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToOne, JoinColumn, Unique, PrimaryColumn } from 'typeorm';
 
-import { User } from 'src/user';
+import { User } from 'src/user/user.entity';
 import { OtpType } from './otp.enum';
 
 /**

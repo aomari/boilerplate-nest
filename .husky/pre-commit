@@ -1,7 +1,6 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-
 # Check TypeScript types
 npx tsc --noEmit
 
@@ -9,3 +8,6 @@ npx eslint . --fix
 
 # Format staged files
 npx prettier --write .
+
+# Run tests
+yarn test

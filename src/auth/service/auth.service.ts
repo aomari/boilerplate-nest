@@ -1,6 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User, UserService, UserStatus } from 'src/user';
+import { UserService } from 'src/user';
+import { UserStatus } from 'src/user/user.enum';
+import { User } from 'src/user/user.entity';
 import { ConfigService } from '@nestjs/config';
 
 import { PasswordService } from './password.service';
@@ -43,6 +45,7 @@ export class AuthService {
     private readonly i18n: I18nService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly passwordService: PasswordService,
     private readonly otpService: OtpService,
