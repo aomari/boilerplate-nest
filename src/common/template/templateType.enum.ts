@@ -1,4 +1,4 @@
 export enum TemplateType {
-  VerifyEmail = 'verify-otp.template.ejs',
-  ForgetPassword = 'forget-password-otp.template.ejs',
+  VerifyEmail = 'verify-otp.template',
+  ForgetPassword = 'forget-password-otp.template',
 }

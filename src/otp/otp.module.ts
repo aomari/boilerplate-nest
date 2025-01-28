@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { OtpService } from './otp.service';
 import { Otp } from './otp.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,7 +14,11 @@ import { MailModule } from 'src/mail';
  * @typedef {OtpModule}
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([Otp]), LoggerModule, MailModule],
+  imports: [
+    TypeOrmModule.forFeature([Otp]),
+    forwardRef(() => LoggerModule),
+    forwardRef(() => MailModule),
+  ],
   providers: [OtpService],
   exports: [OtpService],
 })

@@ -85,23 +85,20 @@ export class OtpService {
    */
   private async sendOtpMail(params: SendOtpMailParams): Promise<boolean> {
     const { templateType, subject, recipientName, targetEmail, otp } = params;
-    const templatePath = path.join(process.cwd(), 'src/common/template', templateType);
-    return await ejs.renderFile(
-      templatePath,
-      {
-        otp,
-        recipientName,
-      },
-      async (err, data) => {
-        if (err) return false;
+    const templatePath = path.join(process.cwd(), 'src/common/template', `${templateType}.ejs`);
 
-        return await this.mailService.sendMail({
-          to: targetEmail,
-          subject,
-          html: data,
-        });
-      },
-    );
+    try {
+      const data = await ejs.renderFile(templatePath, { otp, recipientName });
+      const mailSent = await this.mailService.sendMail({
+        to: targetEmail,
+        subject,
+        html: data,
+      });
+      return mailSent;
+    } catch (err) {
+      console.error('Error sending OTP mail:', err);
+      return false;
+    }
   }
 
   /**
@@ -155,13 +152,19 @@ export class OtpService {
         },
         ['userId', 'type'],
       );
-      await this.sendOtpMail({
+
+      // Send OTP via email
+      const mailSent = await this.sendOtpMail({
         templateType,
         subject,
         targetEmail,
         recipientName,
         otp,
       });
+
+      if (!mailSent) {
+        return { success: false, message: 'Failed to send OTP mail.' };
+      }
 
       return {
         success: true,
