@@ -33,13 +33,13 @@ describe('AuthController', () => {
 
   const testUsers = [
     {
-      username: 'Amjad Omari',
+      username: 'Amjad AlOmari',
       email: 'amjad1@test.com',
       password: 'Test@123',
       role: UserRole.USER,
     },
     {
-      username: 'Amjad Omari',
+      username: 'aomari',
       email: 'amjad2@test.com',
       password: 'Test@123',
       role: UserRole.ADMIN,
@@ -85,6 +85,10 @@ describe('AuthController', () => {
       mockAuthService.signupService.mockResolvedValue(expectedResponse);
 
       const result = await authController.signup(signupDto);
+
+      console.log('Signup DTO:', signupDto);
+      console.log('Signup Result:', result);
+
       expect(mockAuthService.signupService).toHaveBeenCalledWith(signupDto);
       expect(result).toEqual(expectedResponse);
     });
