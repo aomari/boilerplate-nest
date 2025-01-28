@@ -11,6 +11,10 @@ describe('PasswordService', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let configService: ConfigService;
 
+  afterEach(() => {
+    jest.resetAllMocks(); // Reset all mocks after each test
+  });
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [

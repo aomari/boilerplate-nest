@@ -86,9 +86,6 @@ describe('AuthController', () => {
 
       const result = await authController.signup(signupDto);
 
-      console.log('Signup DTO:', signupDto);
-      console.log('Signup Result:', result);
-
       expect(mockAuthService.signupService).toHaveBeenCalledWith(signupDto);
       expect(result).toEqual(expectedResponse);
     });

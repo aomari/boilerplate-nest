@@ -1,4 +1,6 @@
 module.exports = {
+  globalSetup: null,
+  globalTeardown: null,
   preset: 'ts-jest',
   testEnvironment: 'node',
   moduleNameMapper: {
