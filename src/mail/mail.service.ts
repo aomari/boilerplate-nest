@@ -31,8 +31,7 @@ export class MailService {
 
       await this.transporter.sendMail(options);
       return true;
-    } catch (error) {
-      console.error('Error sending email:', error);
+    } catch {
       return false;
     }
   }

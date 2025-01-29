@@ -1,5 +1,4 @@
 import 'winston-daily-rotate-file';
-
 import { Injectable } from '@nestjs/common';
 import * as Sentry from '@sentry/node';
 import * as fs from 'fs';
@@ -8,16 +7,16 @@ import * as winston from 'winston';
 
 @Injectable()
 export class LoggerService {
-  private logger: winston.Logger;
+  private readonly logger: winston.Logger;
+  private logDir: string;
 
   constructor() {
-    const logDir = path.join(process.cwd(), 'logs');
+    this.logDir = path.join(process.cwd(), 'logs');
 
     // Ensure logs directory exists
-    if (!fs.existsSync(logDir)) {
-      fs.mkdirSync(logDir);
+    if (!fs.existsSync(this.logDir)) {
+      fs.mkdirSync(this.logDir);
     }
-
     const logLevel = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
 
     // Initialize Sentry
@@ -37,7 +36,7 @@ export class LoggerService {
       ),
       transports: [
         new winston.transports.DailyRotateFile({
-          filename: path.join(logDir, 'Backend-logs-%DATE%.log'),
+          filename: path.join(this.logDir, 'Backend-logs-%DATE%.log'),
           datePattern: 'YYYY-MM-DD',
           maxFiles: '14d',
         }),
@@ -46,7 +45,14 @@ export class LoggerService {
     });
   }
 
-  private formatMessage(message: string, requestId?: string) {
+  // Private method
+  private createLogDirectory() {
+    if (!fs.existsSync(this.logDir)) {
+      fs.mkdirSync(this.logDir, { recursive: true });
+    }
+  }
+
+  private formatMessage(message: string, requestId?: string): string {
     return requestId ? `[RequestID: ${requestId}] ${message}` : message;
   }
 
@@ -63,12 +69,13 @@ export class LoggerService {
   }
 
   error(message: string, trace?: string, requestId?: string) {
-    this.logger.error(this.formatMessage(message, requestId));
+    const formattedMessage = this.formatMessage(message, requestId);
+    this.logger.error(formattedMessage);
     if (trace) {
       this.logger.error(trace);
     }
 
     // Send error to Sentry
-    Sentry.captureException(new Error(this.formatMessage(message, requestId)));
+    Sentry.captureException(new Error(formattedMessage));
   }
 }
