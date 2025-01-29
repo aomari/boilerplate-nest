@@ -2,11 +2,10 @@ import type { ValidationError } from '@nestjs/common';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 
 export const DtoValidationPipe = new ValidationPipe({
-  whitelist: true, // Strips properties not defined in the DTO
-  forbidNonWhitelisted: true, // Throws an error if extra properties are provided
-  transform: true, // Transforms input to the expected type
+  whitelist: true,
+  forbidNonWhitelisted: true, // ✅ Ensures unknown properties throw an error
+  transform: true,
   exceptionFactory: (errors: ValidationError[]) => {
-    // Format validation errors to include constraints as an array of strings
     return new BadRequestException({
       fieldMessage: errors.map((error) => ({
         [error.property]: Object.values(error.constraints)[0],
