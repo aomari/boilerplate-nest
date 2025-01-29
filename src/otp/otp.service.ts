@@ -170,9 +170,7 @@ export class OtpService {
         success: true,
         message: 'OTP has been sent successfully.',
       };
-    } catch (error) {
-      console.log('there is an error', error);
-
+    } catch {
       return {
         success: false,
         message: 'Failed to send OTP mail.',

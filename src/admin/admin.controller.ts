@@ -43,7 +43,6 @@ export class AdminController {
     },
   })
   async getAllUsers(@Query(DtoValidationPipe) query: PaginationDto) {
-    console.log('Parsed Query:', query);
     return this.adminService.getAllUsers(query);
   }
 
