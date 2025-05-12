@@ -42,7 +42,7 @@
     "@sentry/node": "^8.47.0",
     "accept-language-parser": "^1.5.0",
     "axios": "^1.7.9",
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.7",
